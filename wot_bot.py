@@ -1,11 +1,12 @@
-import time
 import json
 import sys
 import logging
 
 from selenium import webdriver
-from selenium.common import NoSuchElementException
+from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import FirefoxService, FirefoxOptions, ChromeService, ChromeOptions
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
@@ -94,26 +95,23 @@ class WotBot:
     def get_gift(self):
         self.logger.info("Open the required page")
         self.browser.get(self.url)
-        time.sleep(10)
 
         self.logger.info("Click on the login button")
-        login_button = self.browser.find_element(By.CSS_SELECTOR, "[data-cm-event='login']")
-        login_button.click()
+        login = self.browser.find_element(By.CSS_SELECTOR, "[data-cm-event='login']")
+        login.click()
 
         self.logger.info("Waiting for a redirect")
-        time.sleep(30)
+        username = WebDriverWait(self.browser, 30).until(ec.presence_of_element_located((By.ID, "id_login")))
+        password = WebDriverWait(self.browser, 30).until(ec.presence_of_element_located((By.ID, "id_password")))
 
         self.logger.info("Fill in the username and password")
-        username_field = self.browser.find_element(By.ID, "id_login")
-        username_field.send_keys(self.username)
-        password_field = self.browser.find_element(By.ID, "id_password")
-        password_field.send_keys(self.password)
+        username.send_keys(self.username)
+        password.send_keys(self.password)
 
         try:
             self.logger.info("Waiting for a login process")
-            submit_button = self.browser.find_element(By.CSS_SELECTOR, "button.button-airy")
-            submit_button.click()
-            time.sleep(10)
+            submit = self.browser.find_element(By.CSS_SELECTOR, "button.button-airy")
+            submit.click()
             self.check_login_status()
 
             self.logger.info("Try to get a gift")
@@ -134,8 +132,9 @@ class WotBot:
 
     def check_login_status(self):
         try:
-            login_status = self.browser.find_element(By.CSS_SELECTOR, "p.js-form-errors-content")
+            login_status = WebDriverWait(self.browser, 5).until(
+                ec.presence_of_element_located((By.CSS_SELECTOR, "p.js-form-errors-content")))
             if login_status is not None:
                 raise LoginException()
-        except NoSuchElementException:
+        except TimeoutException:
             pass
