@@ -10,8 +10,8 @@ from selenium.webdriver import FirefoxService, FirefoxOptions, ChromeService, Ch
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 
-from custom_filter import CustomFilter
-from custom_formatter import CustomFormatter
+from wot_filters import ConsoleFilter, FileFilter
+from wot_formatter import CustomFormatter
 
 
 class WotBot:
@@ -26,12 +26,17 @@ class WotBot:
 
 
     def get_logger(self):
-        handler = logging.StreamHandler(sys.stdout)
-        handler.addFilter(CustomFilter())
-        handler.setFormatter(CustomFormatter())
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.addFilter(ConsoleFilter())
+        console_handler.setFormatter(CustomFormatter())
+
+        file_handler = logging.FileHandler("wot_bot.log")
+        file_handler.addFilter(FileFilter())
+        file_handler.setFormatter(CustomFormatter())
 
         logger = logging.getLogger()
-        logger.addHandler(handler)
+        logger.addHandler(console_handler)
+        logger.addHandler(file_handler)
         logger.setLevel(logging.INFO)
 
         return logger
