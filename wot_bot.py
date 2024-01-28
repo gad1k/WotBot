@@ -10,6 +10,7 @@ from selenium.webdriver import FirefoxService, FirefoxOptions, ChromeService, Ch
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 
+from wot_exception import LoginException
 from wot_filters import ConsoleFilter, FileFilter
 from wot_formatter import CustomFormatter
 
@@ -108,19 +109,33 @@ class WotBot:
         password_field = self.browser.find_element(By.ID, "id_password")
         password_field.send_keys(self.password)
 
-        self.logger.info("Waiting for a login process")
-        submit_button = self.browser.find_element(By.CSS_SELECTOR, "button.button-airy")
-        submit_button.click()
-        time.sleep(10)
-
         try:
+            self.logger.info("Waiting for a login process")
+            submit_button = self.browser.find_element(By.CSS_SELECTOR, "button.button-airy")
+            submit_button.click()
+            time.sleep(10)
+            self.check_login_status()
+
             self.logger.info("Try to get a gift")
             cur_item = self.browser.find_element(By.CSS_SELECTOR, ".c_item.c_default")
             cur_item.click()
 
             gift_desc = f"Your gift for today: {cur_item.text}"
             self.logger.info(gift_desc)
+        except LoginException:
+            self.logger.error("The login process failed")
+            self.stop_browser()
+            sys.exit()
         except NoSuchElementException:
             self.logger.warning("The gift has already been received")
             self.stop_browser()
             sys.exit()
+
+
+    def check_login_status(self):
+        try:
+            login_status = self.browser.find_element(By.CSS_SELECTOR, "p.js-form-errors-content")
+            if login_status is not None:
+                raise LoginException()
+        except NoSuchElementException:
+            pass

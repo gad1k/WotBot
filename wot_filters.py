@@ -8,4 +8,5 @@ class ConsoleFilter(logging.Filter):
 
 class FileFilter(logging.Filter):
     def filter(self, record):
-        return record.getMessage().startswith("Your gift for today")
+        return (record.getMessage().startswith("Your gift for today") or
+                record.levelname == "ERROR")
