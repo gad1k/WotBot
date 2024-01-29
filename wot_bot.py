@@ -82,6 +82,8 @@ class WotBot:
 
         options.add_argument("--window-size=1280,900")
         options.add_argument("--disable-gpu")
+        options.add_argument("--log-level=3")
+        options.add_argument("--ignore-certificate-errors")
 
         return options
 
