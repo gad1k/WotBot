@@ -121,7 +121,7 @@ class WotBot:
             cur_item.click()
 
             gift_desc = f"Your gift for today: {cur_item.text}"
-            self.logger.info(gift_desc)
+            self.logger.info(gift_desc.replace("\n", " "))
         except LoginException:
             self.logger.error("The login process failed")
             self.stop_browser()
