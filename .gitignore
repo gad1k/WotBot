@@ -3,3 +3,4 @@ __pycache__/
 venv/
 
 wot_bot.log
+script_daily.bat
