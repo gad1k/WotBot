@@ -1,7 +1,7 @@
 import sys
 import logging
 
-from telegram_agent import TelegramAgent
+from agent import TelegramAgent
 
 
 class TelegramHandler(logging.FileHandler):
