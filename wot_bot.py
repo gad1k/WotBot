@@ -1,6 +1,5 @@
 import json
 import sys
-import logging
 
 from selenium import webdriver
 from selenium.common import NoSuchElementException, TimeoutException
@@ -12,9 +11,7 @@ from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 
 from exception import LoginException
-from filter import CommonFilter, ConsoleFilter
-from formatter import CommonFormatter
-from handler import TelegramHandler
+from logger import CustomLogger
 
 
 class WotBot:
@@ -24,26 +21,9 @@ class WotBot:
         self.username = None
         self.password = None
         self.token = None
-        self.logger = self.get_logger()
+        self.logger = CustomLogger()
         self.driver = None
         self.browser = None
-
-
-    def get_logger(self):
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.addFilter(ConsoleFilter())
-        console_handler.setFormatter(CommonFormatter())
-
-        file_handler = logging.FileHandler("wot_bot.log")
-        file_handler.addFilter(CommonFilter())
-        file_handler.setFormatter(CommonFormatter())
-
-        logger = logging.getLogger()
-        logger.addHandler(console_handler)
-        logger.addHandler(file_handler)
-        logger.setLevel(logging.INFO)
-
-        return logger
 
 
     def config_props(self):
@@ -60,19 +40,12 @@ class WotBot:
                 self.driver = data["driver"]
 
                 if len(self.token) != 0:
-                    self.add_telegram_handler()
+                    self.logger.info("Add telegram notification functionality")
+                    self.logger.add_telegram_handler(self.token)
         except FileNotFoundError:
             self.logger.error("There is no such config file")
             self.stop_browser()
             sys.exit()
-
-
-    def add_telegram_handler(self):
-        self.logger.info("Add a telegram handler")
-
-        telegram_handler = TelegramHandler(self.token)
-        telegram_handler.addFilter(CommonFilter())
-        self.logger.addHandler(telegram_handler)
 
 
     def start_browser(self, headless: bool = True):
