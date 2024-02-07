@@ -1,7 +1,7 @@
 import logging
 
 
-class CustomFormatter(logging.Formatter):
+class CommonFormatter(logging.Formatter):
     def format(self, record):
         output = "%(asctime)s [%(levelname)s] %(message)s"
 
