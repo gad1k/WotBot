@@ -10,22 +10,30 @@ https://www.python.org/downloads/
 ```
 
 ### Initial Configuration
-Before using the bot on a daily basis, you need to create a virtual environment and download all the necessary dependencies by running the following script:
+At the very beginning, you should run the script below:
 ```
 script_init.bat
 ```
+This script performs the following actions:
+- creates a virtual environment
+- downloads all the necessary dependencies
+- generates the daily script (*script_daily.bat*)
+- sets up a schedule task (*WotDaily*)
+
 Then specify the relevant username and password to <b>config.json</b> file:
 ```
 {
   "driver": "Chrome",
   "url": "https://tanki.su/ru/daily-check-in/",
   "username": "",
-  "password": ""
+  "password": "",
+  "token": ""
 }
 ```
+**Note** If you want to get notifications via Telegram, you will also need to provide the appropriate token.
 
 ### Daily Checkin
-To receive a gift, it's just needed to run the next script:
+The schedule task runs this script every hour. At the same time, you can run the script manually:
 ```
 script_daily.bat
 ```
