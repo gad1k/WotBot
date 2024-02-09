@@ -1,5 +1,7 @@
 import requests
 
+from exception import InactiveChatException, InvalidTokenException
+
 
 class TelegramExporter:
     def __init__(self, token):
@@ -8,10 +10,15 @@ class TelegramExporter:
 
 
     def retrieve_chat_id(self):
-        url = f"https://api.telegram.org/bot{self.token}/getUpdates"
-        response = requests.get(url).json()
+        try:
+            url = f"https://api.telegram.org/bot{self.token}/getUpdates"
+            response = requests.get(url).json()
 
-        self.chat_id = response["result"][-1]["message"]["chat"]["id"]
+            self.chat_id = response["result"][-1]["message"]["chat"]["id"]
+        except IndexError:
+            raise InactiveChatException()
+        except KeyError:
+            raise InvalidTokenException()
 
 
     def send_message(self, message):

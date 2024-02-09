@@ -10,7 +10,7 @@ from selenium.webdriver import FirefoxService, FirefoxOptions, ChromeService, Ch
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 
-from exception import CredsException, LoginException
+from exception import CredsException, InactiveChatException, InvalidTokenException, LoginException
 from logger import CustomLogger
 
 
@@ -44,6 +44,12 @@ class WotBot:
                     self.logger.add_telegram_handler(self.token)
         except CredsException:
             self.logger.error("Username or password isn't set")
+            sys.exit()
+        except InactiveChatException:
+            self.logger.warning("Telegram bot is inactive")
+            sys.exit()
+        except InvalidTokenException:
+            self.logger.error("Telegram token is incorrect")
             sys.exit()
         except FileNotFoundError:
             self.logger.error("There is no such config file")
