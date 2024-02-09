@@ -1,7 +1,7 @@
 import sys
 import logging
 
-from agent import TelegramAgent
+from exporter import TelegramExporter
 
 
 class TelegramHandler(logging.FileHandler):
@@ -9,9 +9,9 @@ class TelegramHandler(logging.FileHandler):
         logging.Handler.__init__(self)
         self.stream = sys.stdout
 
-        self.telegram_agent = TelegramAgent(token)
-        self.telegram_agent.retrieve_chat_id()
+        self.telegram_exporter = TelegramExporter(token)
+        self.telegram_exporter.retrieve_chat_id()
 
 
     def emit(self, record):
-        self.telegram_agent.send_message(self.format(record))
+        self.telegram_exporter.send_message(self.format(record))

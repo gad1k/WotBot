@@ -1,7 +1,7 @@
 import requests
 
 
-class TelegramAgent:
+class TelegramExporter:
     def __init__(self, token):
         self.token = token
         self.chat_id = None
