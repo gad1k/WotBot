@@ -10,7 +10,7 @@ from selenium.webdriver import FirefoxService, FirefoxOptions, ChromeService, Ch
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.chrome import ChromeDriverManager
 
-from exception import LoginException
+from exception import CredsException, LoginException
 from logger import CustomLogger
 
 
@@ -34,17 +34,19 @@ class WotBot:
                 data = json.load(config)
 
                 self.url = data["url"]
-                self.username = data["username"]
-                self.password = data["password"]
+                self.username = self.check_creds(data["username"])
+                self.password = self.check_creds(data["password"])
                 self.token = data["token"]
                 self.driver = data["driver"]
 
-                if len(self.token) != 0:
+                if self.token:
                     self.logger.info("Add telegram notification functionality")
                     self.logger.add_telegram_handler(self.token)
+        except CredsException:
+            self.logger.error("Username or password isn't set")
+            sys.exit()
         except FileNotFoundError:
             self.logger.error("There is no such config file")
-            self.stop_browser()
             sys.exit()
 
 
@@ -117,6 +119,13 @@ class WotBot:
             self.logger.warning("The gift has already been received")
             self.stop_browser()
             sys.exit()
+
+
+    def check_creds(self, creds):
+        if not creds:
+            raise CredsException()
+
+        return creds
 
 
     def check_login_status(self):
