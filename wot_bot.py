@@ -1,6 +1,7 @@
 import json
 import sys
 
+from datetime import datetime
 from selenium import webdriver
 from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
@@ -125,6 +126,22 @@ class WotBot:
             self.logger.warning("The gift has already been received")
             self.stop_browser()
             sys.exit()
+
+
+    def check_logs(self):
+        self.logger.info("Check the log for whether a gift has been received")
+
+        cur_date = datetime.today().strftime("%Y-%m-%d")
+        with open("wot_bot.log") as file:
+            logs = [line.strip() for line in file]
+
+        for log in reversed(logs):
+            items = log.split(" ", 3)
+            if items[0] != cur_date:
+                break
+            if items[2] == "[INFO]":
+                self.logger.warning("The gift has already been received")
+                sys.exit()
 
 
     def check_creds(self, creds):
