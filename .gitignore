@@ -1,6 +1,6 @@
 .idea/
+.venv/
 __pycache__/
-venv/
 
 script_daily.bat
 wot_bot.log
