@@ -18,6 +18,7 @@ This script performs the following actions:
 - creates a virtual environment
 - downloads all the necessary dependencies
 - generates the daily script (*script_daily.bat*)
+- generates the schedule script (*script_schedule.vbs*)
 - sets up a schedule task (*WotDaily*)
 
 Then specify the relevant username and password to <b>config.json</b> file:
