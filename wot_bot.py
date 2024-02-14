@@ -48,10 +48,8 @@ class WotBot:
             sys.exit()
         except InactiveChatException:
             self.logger.warning("Telegram bot is inactive")
-            sys.exit()
         except InvalidTokenException:
-            self.logger.error("Telegram token is incorrect")
-            sys.exit()
+            self.logger.warning("Telegram token is incorrect")
         except FileNotFoundError:
             self.logger.error("There is no such config file")
             sys.exit()
