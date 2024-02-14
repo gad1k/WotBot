@@ -3,4 +3,5 @@
 __pycache__/
 
 script_daily.bat
+script_schedule.vbs
 wot_bot.log
