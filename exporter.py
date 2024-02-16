@@ -9,16 +9,31 @@ class TelegramExporter:
         self.chat_id = None
 
 
-    def retrieve_chat_id(self):
+    def try_upload_cached_chat_id(self):
         try:
-            url = f"https://api.telegram.org/bot{self.token}/getUpdates"
-            response = requests.get(url).json()
+            with open(".settings") as settings:
+                self.chat_id = settings.readline()
+        except FileNotFoundError:
+            pass
 
-            self.chat_id = response["result"][-1]["message"]["chat"]["id"]
+
+    def try_retrieve_chat_id_remotely(self):
+        try:
+            if not self.chat_id:
+                url = f"https://api.telegram.org/bot{self.token}/getUpdates"
+                response = requests.get(url).json()
+
+                self.chat_id = response["result"][-1]["message"]["chat"]["id"]
+                self.save_settings()
         except IndexError:
             raise InactiveChatException()
         except KeyError:
             raise InvalidTokenException()
+
+
+    def save_settings(self):
+        with open(".settings", "w", encoding="utf-8") as settings:
+            settings.write(str(self.chat_id))
 
 
     def send_message(self, message):

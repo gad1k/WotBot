@@ -10,7 +10,8 @@ class TelegramHandler(logging.FileHandler):
         self.stream = sys.stdout
 
         self.telegram_exporter = TelegramExporter(token)
-        self.telegram_exporter.retrieve_chat_id()
+        self.telegram_exporter.try_upload_cached_chat_id()
+        self.telegram_exporter.try_retrieve_chat_id_remotely()
 
 
     def emit(self, record):
