@@ -1,5 +1,7 @@
 import json
 import sys
+import pickle
+import time
 
 from datetime import datetime
 from selenium import webdriver
@@ -92,23 +94,26 @@ class WotBot:
         self.logger.info("Open the required page")
         self.browser.get(self.url)
 
-        self.logger.info("Click on the login button")
-        login = self.browser.find_element(By.CSS_SELECTOR, "[data-cm-event='login']")
-        login.click()
-
-        self.logger.info("Waiting for a redirect")
-        username = WebDriverWait(self.browser, 30).until(ec.presence_of_element_located((By.ID, "id_login")))
-        password = WebDriverWait(self.browser, 30).until(ec.presence_of_element_located((By.ID, "id_password")))
-
-        self.logger.info("Fill in the username and password")
-        username.send_keys(self.username)
-        password.send_keys(self.password)
-
         try:
-            self.logger.info("Waiting for a login process")
-            submit = self.browser.find_element(By.CSS_SELECTOR, "button.button-airy")
-            submit.click()
-            self.check_login_status()
+            if not self.use_cookies():
+                self.logger.info("Click on the login button")
+                login = self.browser.find_element(By.CSS_SELECTOR, "[data-cm-event='login']")
+                login.click()
+
+                self.logger.info("Waiting for a redirect")
+                username = WebDriverWait(self.browser, 30).until(ec.presence_of_element_located((By.ID, "id_login")))
+                password = WebDriverWait(self.browser, 30).until(ec.presence_of_element_located((By.ID, "id_password")))
+
+                self.logger.info("Fill in the username and password")
+                username.send_keys(self.username)
+                password.send_keys(self.password)
+
+                self.logger.info("Waiting for a login process")
+                submit = self.browser.find_element(By.CSS_SELECTOR, "button.button-airy")
+                submit.click()
+
+                self.check_login_status()
+                self.save_cookies()
 
             self.logger.info("Try to get a gift")
             cur_item = self.browser.find_element(By.CSS_SELECTOR, ".c_item.c_default")
@@ -157,3 +162,22 @@ class WotBot:
                 raise LoginException()
         except TimeoutException:
             pass
+
+
+    def use_cookies(self):
+        try:
+            for cookie in pickle.load(open(".cookies", "rb")):
+                self.browser.add_cookie(cookie)
+
+            self.logger.info("Upload the cookie file")
+            self.browser.refresh()
+
+            return True
+        except FileNotFoundError:
+            self.logger.warning("There is no cookie")
+            return False
+
+
+    def save_cookies(self):
+        pickle.dump(self.browser.get_cookies(), open(".cookies", "wb"))
+        self.logger.info("Save a cookie file")
