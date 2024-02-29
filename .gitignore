@@ -2,6 +2,7 @@
 .venv/
 __pycache__/
 
+.cookies
 .settings
 script_daily.bat
 script_schedule.vbs
