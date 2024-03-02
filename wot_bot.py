@@ -170,19 +170,19 @@ class WotBot:
 
 
     def use_cookies(self):
+        self.logger.info("Try to upload and use the cookie file")
         try:
-            for cookie in pickle.load(open(".cookies", "rb")):
+            for cookie in pickle.load(open(".cookies1", "rb")):
                 self.browser.add_cookie(cookie)
 
-            self.logger.info("Upload the cookie file")
             self.browser.refresh()
 
             return True
         except FileNotFoundError:
-            self.logger.warning("There is no cookie")
+            self.logger.warning("There is no cookie file")
             return False
 
 
     def save_cookies(self):
-        pickle.dump(self.browser.get_cookies(), open(".cookies", "wb"))
         self.logger.info("Save a cookie file")
+        pickle.dump(self.browser.get_cookies(), open(".cookies", "wb"))

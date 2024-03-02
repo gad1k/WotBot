@@ -31,6 +31,11 @@ Then specify the relevant username and password to <b>config.json</b> file:
   "token": ""
 }
 ```
+Below are the possible values for the driver tag:
+>- Chrome
+>- Edge
+>- Firefox
+
 **Note** If you want to get notifications via Telegram, you will also need to provide the appropriate token.
 
 ### Daily Checkin
