@@ -1,7 +1,6 @@
 import json
 import sys
 import pickle
-import time
 
 from datetime import datetime
 from selenium import webdriver
@@ -9,9 +8,10 @@ from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver import FirefoxService, FirefoxOptions, ChromeService, ChromeOptions
-from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver import ChromeService, ChromeOptions, EdgeService, EdgeOptions, FirefoxService, FirefoxOptions
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 from exception import CredsException, InactiveChatException, InvalidTokenException, LoginException
 from logger import CustomLogger
@@ -65,6 +65,11 @@ class WotBot:
             options = self.set_options(headless, ChromeOptions())
 
             self.browser = webdriver.Chrome(service=service, options=options)
+        elif self.driver == "Edge":
+            service = EdgeService(EdgeChromiumDriverManager().install())
+            options = self.set_options(headless, EdgeOptions())
+
+            self.browser = webdriver.Edge(service=service, options=options)
         else:
             service = FirefoxService(GeckoDriverManager().install())
             options = self.set_options(headless, FirefoxOptions())
