@@ -1,4 +1,3 @@
-import json
 import sys
 import pickle
 
@@ -13,13 +12,14 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
+from config import Config
 from exception import CredsException, InactiveChatException, InvalidTokenException, LoginException
 from logger import CustomLogger
 
 
 class WotBot:
-    def __init__(self, config_path):
-        self.config_path = config_path
+    def __init__(self, path):
+        self.config = Config(path)
         self.url = None
         self.username = None
         self.password = None
@@ -33,18 +33,17 @@ class WotBot:
         self.logger.info("Config the bot properties")
 
         try:
-            with open(self.config_path) as config:
-                data = json.load(config)
+            props = self.config.prepare_data()
 
-                self.url = data["url"]
-                self.username = self.check_creds(data["username"])
-                self.password = self.check_creds(data["password"])
-                self.token = data["token"]
-                self.driver = data["driver"]
+            self.url = props["url"]
+            self.username = props["username"]
+            self.password = props["password"]
+            self.token = props["token"]
+            self.driver = props["driver"]
 
-                if self.token:
-                    self.logger.info("Add telegram notification functionality")
-                    self.logger.add_telegram_handler(self.token)
+            if self.token:
+                self.logger.info("Add telegram notification functionality")
+                self.logger.add_telegram_handler(self.token)
         except CredsException:
             self.logger.error("Username or password isn't set")
             sys.exit()
@@ -152,13 +151,6 @@ class WotBot:
                 sys.exit()
 
 
-    def check_creds(self, creds):
-        if not creds:
-            raise CredsException()
-
-        return creds
-
-
     def check_login_status(self):
         try:
             login_status = WebDriverWait(self.browser, 5).until(
@@ -172,7 +164,7 @@ class WotBot:
     def use_cookies(self):
         self.logger.info("Try to upload and use the cookie file")
         try:
-            for cookie in pickle.load(open(".cookies1", "rb")):
+            for cookie in pickle.load(open(".cookies", "rb")):
                 self.browser.add_cookie(cookie)
 
             self.browser.refresh()
