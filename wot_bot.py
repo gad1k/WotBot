@@ -1,7 +1,6 @@
 import sys
 import pickle
 
-from datetime import datetime
 from selenium import webdriver
 from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By

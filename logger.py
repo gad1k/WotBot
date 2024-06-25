@@ -10,12 +10,13 @@ from handler import TelegramHandler
 class CustomLogger(logging.Logger):
     def __init__(self):
         super().__init__(name=__name__, level=logging.INFO)
+        self.log_path = "wot_bot.log"
 
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.addFilter(StreamFilter())
         stream_handler.setFormatter(StreamFormatter())
 
-        file_handler = logging.FileHandler("wot_bot.log")
+        file_handler = logging.FileHandler(self.log_path)
         file_handler.addFilter(CommonFilter())
         file_handler.setFormatter(FileFormatter())
 
@@ -33,7 +34,8 @@ class CustomLogger(logging.Logger):
 
     def check_gift_received(self):
         cur_date = datetime.today().strftime("%Y-%m-%d")
-        with open("wot_bot.log") as file:
+
+        with open(self.log_path) as file:
             logs = [line.strip() for line in file]
 
         for log in reversed(logs):
