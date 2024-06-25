@@ -1,7 +1,7 @@
 import sys
 import logging
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from filter import CommonFilter, StreamFilter
 from formatter import FileFormatter, StreamFormatter
 from handler import TelegramHandler
@@ -40,7 +40,10 @@ class CustomLogger(logging.Logger):
 
         for log in reversed(logs):
             items = log.split(" ", 3)
-            if items[0] != cur_date:
+            utc_log_ts = datetime.strptime(" ".join(items[:2]), "%Y-%m-%d %H:%M:%S,%f") - timedelta(hours=3)
+            log_date = utc_log_ts.strftime("%Y-%m-%d")
+
+            if log_date != cur_date:
                 break
             if items[2] == "[INFO]":
                 return True
