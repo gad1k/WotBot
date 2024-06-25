@@ -11,6 +11,7 @@ class CustomLogger(logging.Logger):
     def __init__(self):
         super().__init__(name=__name__, level=logging.INFO)
         self.log_path = "wot_bot.log"
+        self.fmt_dt = "%Y-%m-%d"
 
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.addFilter(StreamFilter())
@@ -33,15 +34,14 @@ class CustomLogger(logging.Logger):
 
 
     def check_gift_received(self):
-        cur_date = datetime.today().strftime("%Y-%m-%d")
+        cur_date = datetime.today().strftime(self.fmt_dt)
 
         with open(self.log_path) as file:
             logs = [line.strip() for line in file]
 
         for log in reversed(logs):
             items = log.split(" ", 3)
-            utc_log_ts = datetime.strptime(" ".join(items[:2]), "%Y-%m-%d %H:%M:%S,%f") - timedelta(hours=3)
-            log_date = utc_log_ts.strftime("%Y-%m-%d")
+            log_date = self.convert_to_utc(" ".join(items[:2]))
 
             if log_date != cur_date:
                 break
@@ -49,3 +49,10 @@ class CustomLogger(logging.Logger):
                 return True
 
         return False
+
+
+    def convert_to_utc(self, log_ts):
+        fmt_ts = "%Y-%m-%d %H:%M:%S,%f"
+        utc_log_ts = datetime.strptime(log_ts, fmt_ts) - timedelta(hours=3)
+
+        return utc_log_ts.strftime(self.fmt_dt)
