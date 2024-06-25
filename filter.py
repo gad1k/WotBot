@@ -7,6 +7,6 @@ class CommonFilter(logging.Filter):
                 record.levelname == "ERROR")
 
 
-class ConsoleFilter(logging.Filter):
+class StreamFilter(logging.Filter):
     def filter(self, record):
         return record.module == "wot_bot"

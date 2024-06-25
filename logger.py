@@ -1,7 +1,7 @@
 import sys
 import logging
 
-from filter import CommonFilter, ConsoleFilter
+from filter import CommonFilter, StreamFilter
 from formatter import FileFormatter, StreamFormatter
 from handler import TelegramHandler
 
@@ -10,15 +10,15 @@ class CustomLogger(logging.Logger):
     def __init__(self):
         super().__init__(name=__name__, level=logging.INFO)
 
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.addFilter(ConsoleFilter())
-        console_handler.setFormatter(StreamFormatter())
+        stream_handler = logging.StreamHandler(sys.stdout)
+        stream_handler.addFilter(StreamFilter())
+        stream_handler.setFormatter(StreamFormatter())
 
         file_handler = logging.FileHandler("wot_bot.log")
         file_handler.addFilter(CommonFilter())
         file_handler.setFormatter(FileFormatter())
 
-        self.addHandler(console_handler)
+        self.addHandler(stream_handler)
         self.addHandler(file_handler)
         self.setLevel(logging.INFO)
 
