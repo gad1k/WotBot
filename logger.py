@@ -33,7 +33,7 @@ class CustomLogger(logging.Logger):
         self.addHandler(telegram_handler)
 
 
-    def check_gift_received(self):
+    def check_logs(self):
         cur_date = datetime.today().strftime(self.fmt_dt)
 
         with open(self.log_path) as file:

@@ -55,7 +55,7 @@ class WotBot:
             sys.exit()
 
 
-    def start_browser(self, headless: bool = True):
+    def start_browser(self, headless=True):
         self.logger.info("Start a browser")
 
         if self.driver == "Chrome":
@@ -134,10 +134,10 @@ class WotBot:
             sys.exit()
 
 
-    def check_logs(self):
+    def check_gift_status(self):
         self.logger.info("Check the log for whether a gift has been received")
 
-        if self.logger.check_gift_received():
+        if self.logger.check_logs():
             self.logger.warning("The gift has already been received")
             sys.exit()
 
