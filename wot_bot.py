@@ -23,7 +23,7 @@ class WotBot:
         self.username = None
         self.password = None
         self.token = None
-        self.logger = CustomLogger()
+        self.logger = CustomLogger("wot_bot.log")
         self.driver = None
         self.browser = None
 

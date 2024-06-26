@@ -8,9 +8,9 @@ from handler import TelegramHandler
 
 
 class CustomLogger(logging.Logger):
-    def __init__(self):
+    def __init__(self, path):
         super().__init__(name=__name__, level=logging.INFO)
-        self.log_path = "wot_bot.log"
+        self.log_path = path
         self.fmt_dt = "%Y-%m-%d"
 
         stream_handler = logging.StreamHandler(sys.stdout)
@@ -36,19 +36,20 @@ class CustomLogger(logging.Logger):
     def check_logs(self):
         cur_date = datetime.today().strftime(self.fmt_dt)
 
-        with open(self.log_path) as file:
-            logs = [line.strip() for line in file]
-
-        for log in reversed(logs):
+        for log in self.read_logs():
             items = log.split(" ", 3)
             log_date = self.convert_to_utc(" ".join(items[:2]))
 
-            if log_date != cur_date:
-                break
-            if items[2] == "[INFO]":
+            if log_date == cur_date and items[2] == "[INFO]":
                 return True
 
         return False
+
+
+    def read_logs(self):
+        with open(self.log_path) as file:
+            for line in file:
+                yield line.strip()
 
 
     def convert_to_utc(self, log_ts):
