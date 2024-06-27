@@ -10,14 +10,18 @@ from handler import TelegramHandler
 class CustomLogger(logging.Logger):
     def __init__(self, path):
         super().__init__(name=__name__, level=logging.INFO)
-        self.log_path = path
+        self.path = path
         self.fmt_dt = "%Y-%m-%d"
 
+        self.init_default_handlers()
+
+
+    def init_default_handlers(self):
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.addFilter(StreamFilter())
         stream_handler.setFormatter(StreamFormatter())
 
-        file_handler = logging.FileHandler(self.log_path)
+        file_handler = logging.FileHandler(self.path)
         file_handler.addFilter(CommonFilter())
         file_handler.setFormatter(FileFormatter())
 
@@ -47,7 +51,7 @@ class CustomLogger(logging.Logger):
 
 
     def read_logs(self):
-        with open(self.log_path) as file:
+        with open(self.path) as file:
             for line in file:
                 yield line.strip()
 
