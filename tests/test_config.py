@@ -20,35 +20,31 @@ class TestConfig(TestCase):
     @mock.patch("builtins.open")
     @mock.patch("json.load")
     def test_prepare_data(self, mock_json_load, mock_open):
-        file_content = {
+        mock_json_load.return_value = {
             "username": "dummy_username",
             "password": "dummy_password"
         }
 
-        mock_json_load.return_value = file_content
-
         config = Config("dummy_path.json")
         data = config.prepare_data()
 
-        mock_open.assert_called_once_with("dummy_path.json")
         self.assertEqual(data["username"], "dummy_username")
         self.assertEqual(data["password"], "dummy_password")
+        mock_open.assert_called_once_with("dummy_path.json")
 
 
     @mock.patch("builtins.open")
     @mock.patch("json.load")
     def test_upload_data(self, mock_json_load, mock_open):
-        file_content = {
+        mock_json_load.return_value = {
             "username": "dummy_username",
             "password": "dummy_password"
         }
 
-        mock_json_load.return_value = file_content
-
         config = Config("dummy_path.json")
         config.upload_data()
 
-        mock_open.assert_called_once_with("dummy_path.json")
-        mock_json_load.assert_called_once()
         self.assertEqual(config.data["username"], "dummy_username")
         self.assertEqual(config.data["password"], "dummy_password")
+        mock_open.assert_called_once_with("dummy_path.json")
+        mock_json_load.assert_called_once()
