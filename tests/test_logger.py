@@ -1,15 +1,39 @@
-from unittest import mock, TestCase
+import handler
+import logging
+import os
 
 from datetime import datetime
+from unittest import mock, TestCase
+
+from exporter import TelegramExporter
 from logger import CustomLogger
 
 
 class TestLogger(TestCase):
+    @mock.patch.object(TelegramExporter, "try_upload_cached_chat_id")
+    @mock.patch.object(TelegramExporter, "try_retrieve_chat_id_remotely")
+    def test_add_telegram_handler(self, mock_try_retrieve_chat_id_remotely, mock_try_upload_cached_chat_id):
+        path = "dummy_path.log"
+
+        logger = CustomLogger(path)
+        logger.add_telegram_handler("dummy_token")
+
+        self.assertEqual(len(logger.handlers), 3)
+        self.assertIsInstance(logger.handlers[2], handler.TelegramHandler)
+        mock_try_upload_cached_chat_id.assert_called_once()
+        mock_try_retrieve_chat_id_remotely.assert_called_once()
+
+        logger.handlers[1].close()
+
+        if os.path.exists(path):
+            os.remove(path)
+
+
     @mock.patch.object(CustomLogger, "init_default_handlers")
     @mock.patch.object(CustomLogger, "read_logs")
     @mock.patch.object(CustomLogger, "convert_to_utc")
     @mock.patch("logger.datetime")
-    def test_check_logs_1(self, mock_datetime, mock_convert_to_utc, mock_read_logs, mock_init_default_handlers):
+    def test_check_logs_false(self, mock_datetime, mock_convert_to_utc, mock_read_logs, mock_init_default_handlers):
         logger = CustomLogger("dummy_path.log")
 
         mock_datetime.today.return_value = datetime(2024, 6, 27)
@@ -26,7 +50,7 @@ class TestLogger(TestCase):
     @mock.patch.object(CustomLogger, "read_logs")
     @mock.patch.object(CustomLogger, "convert_to_utc")
     @mock.patch("logger.datetime")
-    def test_check_logs_2(self, mock_datetime, mock_convert_to_utc, mock_read_logs, mock_init_default_handlers):
+    def test_check_logs_true(self, mock_datetime, mock_convert_to_utc, mock_read_logs, mock_init_default_handlers):
         logger = CustomLogger("dummy_path.log")
 
         mock_datetime.today.return_value = datetime(2024, 6, 27)
@@ -45,6 +69,21 @@ class TestLogger(TestCase):
 
         self.assertEqual(logger.convert_to_utc("2024-06-26 01:12:40,451"), "2024-06-25")
         mock_init_default_handlers.assert_called_once()
+
+
+    def test_init_default_handlers(self):
+        path = "dummy_path.log"
+
+        logger = CustomLogger(path)
+
+        self.assertEqual(len(logger.handlers), 2)
+        self.assertIsInstance(logger.handlers[0], logging.StreamHandler)
+        self.assertIsInstance(logger.handlers[1], logging.FileHandler)
+
+        logger.handlers[1].close()
+
+        if os.path.exists(path):
+            os.remove(path)
 
 
     @mock.patch.object(CustomLogger, "init_default_handlers")
