@@ -97,9 +97,9 @@ class TestLogger(TestCase):
         )
         mock_open.return_value.__enter__.return_value = iter(file_content.splitlines(True))
 
-        result = [
+        expected_result = [
             "2024-06-26 01:12:40,451 [ERROR] The login process failed",
             "2024-06-26 13:12:30,492 [ERROR] The login process failed"
         ]
-        self.assertEqual(list(logger.read_logs()), result)
+        self.assertEqual(list(logger.read_logs()), expected_result)
         mock_init_default_handlers.assert_called_once()
