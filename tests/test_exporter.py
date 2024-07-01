@@ -2,10 +2,35 @@ from unittest import mock, TestCase
 from requests.models import Response
 
 from exporter import TelegramExporter
+from exception import InactiveChatException, InvalidTokenException
 
 
 class TestExporter(TestCase):
-    def test_file_not_found(self):
+    @mock.patch("requests.get")
+    def test_exception_inactive_chat(self, mock_get):
+        exporter = TelegramExporter("dummy_token")
+
+        response = mock.MagicMock(spec=Response)
+        response.json.return_value = {"result": []}
+        mock_get.return_value = response
+
+        self.assertRaises(InactiveChatException, exporter.try_retrieve_chat_id_remotely)
+        mock_get.assert_called_once_with("https://api.telegram.org/botdummy_token/getUpdates")
+
+
+    @mock.patch("requests.get")
+    def test_exception_invalid_token(self, mock_get):
+        exporter = TelegramExporter("dummy_token")
+
+        response = mock.MagicMock(spec=Response)
+        response.json.return_value = {"error_code": 404}
+        mock_get.return_value = response
+
+        self.assertRaises(InvalidTokenException, exporter.try_retrieve_chat_id_remotely)
+        mock_get.assert_called_once_with("https://api.telegram.org/botdummy_token/getUpdates")
+
+
+    def test_exception_missing_cookie(self):
         exporter = TelegramExporter("dummy_token")
         exporter.try_upload_cached_chat_id()
 
