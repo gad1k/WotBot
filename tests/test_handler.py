@@ -1,5 +1,7 @@
-from unittest import mock, TestCase
 import logging
+
+from unittest import mock, TestCase
+
 from exporter import TelegramExporter
 from handler import TelegramHandler
 
