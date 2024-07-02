@@ -5,16 +5,17 @@ from exception import CredsException
 
 
 class TestConfig(TestCase):
+    def setUp(self):
+        self.config = Config("dummy_path.json")
+
+
     def test_check_data(self):
-        data = {
+        self.config.data = {
             "username": "",
             "password": "dummy_password"
         }
 
-        config = Config("dummy_path.json")
-
-        with mock.patch.object(config, "data", data):
-            self.assertRaises(CredsException, config.check_data)
+        self.assertRaises(CredsException, self.config.check_data)
 
 
     @mock.patch("builtins.open")
@@ -25,8 +26,7 @@ class TestConfig(TestCase):
             "password": "dummy_password"
         }
 
-        config = Config("dummy_path.json")
-        data = config.prepare_data()
+        data = self.config.prepare_data()
 
         self.assertEqual(data["username"], "dummy_username")
         self.assertEqual(data["password"], "dummy_password")
@@ -41,10 +41,9 @@ class TestConfig(TestCase):
             "password": "dummy_password"
         }
 
-        config = Config("dummy_path.json")
-        config.upload_data()
+        self.config.upload_data()
 
-        self.assertEqual(config.data["username"], "dummy_username")
-        self.assertEqual(config.data["password"], "dummy_password")
+        self.assertEqual(self.config.data["username"], "dummy_username")
+        self.assertEqual(self.config.data["password"], "dummy_password")
         mock_open.assert_called_once_with("dummy_path.json")
         mock_json_load.assert_called_once()
