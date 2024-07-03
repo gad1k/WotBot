@@ -1,7 +1,7 @@
 from wot_bot import WotBot
 
 
-bot = WotBot("config.json")
+bot = WotBot("config.json", "wot_bot.log")
 bot.check_gift_status()
 bot.config_props()
 bot.start_browser()

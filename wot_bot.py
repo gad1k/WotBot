@@ -17,13 +17,13 @@ from logger import CustomLogger
 
 
 class WotBot:
-    def __init__(self, path):
-        self.config = Config(path)
+    def __init__(self, config_path, log_path):
+        self.config = Config(config_path)
         self.url = None
         self.username = None
         self.password = None
         self.token = None
-        self.logger = CustomLogger("wot_bot.log")
+        self.logger = CustomLogger(log_path)
         self.driver = None
         self.browser = None
 
