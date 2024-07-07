@@ -17,7 +17,14 @@ class TestWotBot(TestCase):
         self.config_path = "dummy_config.json"
         self.log_path = "dummy_path.log"
         self.messages = [
-
+            "Check the log for whether a gift has been received",
+            "Config the bot properties",
+            "Stop the browser",
+            "Telegram bot is inactive",
+            "Telegram token is incorrect",
+            "The gift has already been received",
+            "There is no such config file",
+            "Username or password isn't set"
         ]
 
         self.bot = WotBot(self.config_path, self.log_path)
@@ -44,7 +51,7 @@ class TestWotBot(TestCase):
 
         self.bot.check_gift_status()
 
-        self.mock_levels["info"].assert_called_once_with(self.bot.logger, "Check the log for whether a gift has been received")
+        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[0])
         mock_check_logs.assert_called_once()
 
 
@@ -55,8 +62,8 @@ class TestWotBot(TestCase):
 
         self.bot.check_gift_status()
 
-        self.mock_levels["info"].assert_called_once_with(self.bot.logger, "Check the log for whether a gift has been received")
-        self.mock_levels["warning"].assert_called_once_with(self.bot.logger, "The gift has already been received")
+        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[0])
+        self.mock_levels["warning"].assert_called_once_with(self.bot.logger, self.messages[5])
         mock_check_logs.assert_called_once()
         mock_exit.assert_called_once()
 
@@ -66,8 +73,8 @@ class TestWotBot(TestCase):
     def test_config_props_creds_exception(self, mock_exit, mock_prepare_data):
         self.bot.config_props()
 
-        self.mock_levels["info"].assert_called_once_with(self.bot.logger, "Config the bot properties")
-        self.mock_levels["error"].assert_called_once_with(self.bot.logger, "Username or password isn't set")
+        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[1])
+        self.mock_levels["error"].assert_called_once_with(self.bot.logger, self.messages[7])
         mock_prepare_data.assert_called_once()
         mock_exit.assert_called_once()
 
@@ -86,7 +93,7 @@ class TestWotBot(TestCase):
         self.bot.config_props()
 
         self.assertEqual(self.mock_levels["info"].call_count, 2)
-        self.mock_levels["warning"].assert_called_once_with(self.bot.logger, "Telegram bot is inactive")
+        self.mock_levels["warning"].assert_called_once_with(self.bot.logger, self.messages[3])
         mock_add_telegram_handler.assert_called_once_with("dummy_token")
 
 
@@ -105,7 +112,7 @@ class TestWotBot(TestCase):
 
         self.assertEqual(self.mock_levels["info"].call_count, 2)
         mock_add_telegram_handler.assert_called_once_with("dummy_token")
-        self.mock_levels["warning"].assert_called_once_with(self.bot.logger, "Telegram token is incorrect")
+        self.mock_levels["warning"].assert_called_once_with(self.bot.logger, self.messages[4])
 
 
     @mock.patch("sys.exit")
@@ -113,8 +120,8 @@ class TestWotBot(TestCase):
         self.bot.config_props()
 
         self.assertRaises(FileNotFoundError, self.bot.config.prepare_data)
-        self.mock_levels["info"].assert_called_once_with(self.bot.logger, "Config the bot properties")
-        self.mock_levels["error"].assert_called_once_with(self.bot.logger, "There is no such config file")
+        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[1])
+        self.mock_levels["error"].assert_called_once_with(self.bot.logger, self.messages[6])
         mock_exit.assert_called_once()
 
 
@@ -158,7 +165,7 @@ class TestWotBot(TestCase):
         self.assertEqual(self.bot.password, "dummy_password")
         self.assertEqual(self.bot.token, "")
         self.assertEqual(self.bot.driver, "Chrome")
-        self.mock_levels["info"].assert_called_once_with(self.bot.logger, "Config the bot properties")
+        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[1])
         mock_prepare_data.assert_called_once()
 
 
@@ -192,4 +199,4 @@ class TestWotBot(TestCase):
 
         self.bot.stop_browser()
 
-        self.mock_levels["info"].assert_called_once_with(self.bot.logger, "Stop the browser")
+        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[2])
