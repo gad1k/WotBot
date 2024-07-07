@@ -1,6 +1,7 @@
 import os
 
 from unittest import mock, TestCase
+from selenium.webdriver import ChromeOptions
 
 from config import Config
 from exception import CredsException, InactiveChatException, InvalidTokenException
@@ -159,3 +160,36 @@ class TestWotBot(TestCase):
         self.assertEqual(self.bot.driver, "Chrome")
         self.mock_levels["info"].assert_called_once_with(self.bot.logger, "Config the bot properties")
         mock_prepare_data.assert_called_once()
+
+
+    def test_set_options_headless_false(self):
+        options = self.bot.set_options(False, ChromeOptions())
+
+        self.assertEqual(options.arguments[0], "--window-size=1280,900")
+        self.assertEqual(options.arguments[1], "--disable-gpu")
+        self.assertEqual(options.arguments[2], "--log-level=3")
+        self.assertEqual(options.arguments[3], "--ignore-certificate-errors")
+
+
+    def test_set_options_headless_true(self):
+        options = self.bot.set_options(True, ChromeOptions())
+
+        self.assertEqual(options.arguments[0], "--headless")
+        self.assertEqual(options.arguments[1], "--window-size=1280,900")
+        self.assertEqual(options.arguments[2], "--disable-gpu")
+        self.assertEqual(options.arguments[3], "--log-level=3")
+        self.assertEqual(options.arguments[4], "--ignore-certificate-errors")
+
+
+    def test_start_browser(self):
+        # self.bot.start_browser()
+        pass
+
+
+    @mock.patch("selenium.webdriver.Chrome")
+    def test_stop_browser(self, MockWebDriver):
+        self.bot.browser = MockWebDriver
+
+        self.bot.stop_browser()
+
+        self.mock_levels["info"].assert_called_once_with(self.bot.logger, "Stop the browser")
