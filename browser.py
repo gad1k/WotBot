@@ -43,6 +43,6 @@ class Browser:
         return options
 
 
-    def stop_browser(self):
+    def stop(self):
         if self.engine is not None:
             self.engine.quit()

@@ -4,6 +4,7 @@ from wot_bot import WotBot
 bot = WotBot("config.json", "wot_bot.log")
 bot.check_gift_status()
 bot.config_props()
-bot.start_browser()
+# bot.start_browser(False)
 bot.get_gift()
-bot.stop_browser()
+# bot.stop_browser()
+pass

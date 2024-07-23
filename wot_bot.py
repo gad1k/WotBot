@@ -1,16 +1,12 @@
 import sys
 import pickle
 
-from selenium import webdriver
 from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver import ChromeService, ChromeOptions, EdgeService, EdgeOptions, FirefoxService, FirefoxOptions
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
+from browser import Browser
 from config import Config
 from exception import CredsException, InactiveChatException, InvalidTokenException, LoginException
 from logger import CustomLogger
@@ -24,8 +20,7 @@ class WotBot:
         self.password = None
         self.token = None
         self.logger = CustomLogger(log_path)
-        self.driver = None
-        self.browser = None
+        self.browser = Browser("Chrome", False)
 
 
     def config_props(self):
@@ -38,7 +33,6 @@ class WotBot:
             self.username = props["username"]
             self.password = props["password"]
             self.token = props["token"]
-            self.driver = props["driver"]
 
             if self.token:
                 self.logger.info("Add telegram notification functionality")
@@ -55,71 +49,39 @@ class WotBot:
             sys.exit()
 
 
-    def start_browser(self, headless=True):
-        self.logger.info("Start a browser")
-
-        if self.driver == "Chrome":
-            service = ChromeService(ChromeDriverManager().install())
-            options = self.set_options(headless, ChromeOptions())
-
-            self.browser = webdriver.Chrome(service=service, options=options)
-        elif self.driver == "Edge":
-            service = EdgeService(EdgeChromiumDriverManager().install())
-            options = self.set_options(headless, EdgeOptions())
-
-            self.browser = webdriver.Edge(service=service, options=options)
-        else:
-            service = FirefoxService(GeckoDriverManager().install())
-            options = self.set_options(headless, FirefoxOptions())
-
-            self.browser = webdriver.Firefox(service=service, options=options)
-
-
-    def set_options(self, headless, options):
-        if headless:
-            options.add_argument("--headless")
-
-        options.add_argument("--window-size=1280,900")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--log-level=3")
-        options.add_argument("--ignore-certificate-errors")
-
-        return options
-
-
     def stop_browser(self):
-        if self.browser is not None:
+        if self.browser.engine is not None:
             self.logger.info("Stop the browser")
-            self.browser.quit()
+            self.browser.stop()
 
 
     def get_gift(self):
         self.logger.info("Open the required page")
-        self.browser.get(self.url)
+        self.browser.engine.get(self.url)
 
         try:
             if not self.use_cookies():
                 self.logger.info("Click on the login button")
-                login = self.browser.find_element(By.CSS_SELECTOR, "[data-cm-event='login']")
+                login = self.browser.engine.find_element(By.CSS_SELECTOR, "[data-cm-event='login']")
                 login.click()
 
                 self.logger.info("Waiting for a redirect")
-                username = WebDriverWait(self.browser, 30).until(ec.presence_of_element_located((By.ID, "id_login")))
-                password = WebDriverWait(self.browser, 30).until(ec.presence_of_element_located((By.ID, "id_password")))
+                username = WebDriverWait(self.browser.engine, 30).until(ec.presence_of_element_located((By.ID, "id_login")))
+                password = WebDriverWait(self.browser.engine, 30).until(ec.presence_of_element_located((By.ID, "id_password")))
 
                 self.logger.info("Fill in the username and password")
                 username.send_keys(self.username)
                 password.send_keys(self.password)
 
                 self.logger.info("Waiting for a login process")
-                submit = self.browser.find_element(By.CSS_SELECTOR, "button.button-airy")
+                submit = self.browser.engine.find_element(By.CSS_SELECTOR, "button.button-airy")
                 submit.click()
 
                 self.check_login_status()
                 self.save_cookies()
 
             self.logger.info("Try to get a gift")
-            cur_item = self.browser.find_element(By.CSS_SELECTOR, ".c_item.c_default")
+            cur_item = self.browser.engine.find_element(By.CSS_SELECTOR, ".c_item.c_default")
             cur_item.click()
 
             gift_desc = f"Your gift for today: {cur_item.text}"
@@ -144,7 +106,7 @@ class WotBot:
 
     def check_login_status(self):
         try:
-            login_status = WebDriverWait(self.browser, 5).until(
+            login_status = WebDriverWait(self.browser.engine, 5).until(
                 ec.presence_of_element_located((By.CSS_SELECTOR, "p.js-form-errors-content")))
             if login_status is not None:
                 raise LoginException()
@@ -156,9 +118,9 @@ class WotBot:
         self.logger.info("Try to upload and use the cookie file")
         try:
             for cookie in pickle.load(open(".cookies", "rb")):
-                self.browser.add_cookie(cookie)
+                self.browser.engine.add_cookie(cookie)
 
-            self.browser.refresh()
+            self.browser.engine.refresh()
 
             return True
         except FileNotFoundError:
@@ -168,4 +130,4 @@ class WotBot:
 
     def save_cookies(self):
         self.logger.info("Save a cookie file")
-        pickle.dump(self.browser.get_cookies(), open(".cookies", "wb"))
+        pickle.dump(self.browser.engine.get_cookies(), open(".cookies", "wb"))
