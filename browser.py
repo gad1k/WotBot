@@ -45,9 +45,16 @@ class Browser:
         return options
 
 
-    def stop(self):
-        if self.engine is not None:
-            self.engine.quit()
+    def check_engine_initialized(self):
+        return self.engine is not None
+
+
+    def stop_engine(self):
+        self.engine.quit()
+
+
+    def get_engine(self):
+        return self.engine
 
 
     def use_cookies(self):

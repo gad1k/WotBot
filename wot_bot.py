@@ -58,32 +58,34 @@ class WotBot:
 
 
     def release_resources(self):
-        if self.browser.engine is not None:
-            self.logger.info("Stop the browser")
-            self.browser.stop()
+        if self.browser.check_engine_initialized():
+            self.logger.info("Release resources")
+            self.browser.stop_engine()
 
 
     def get_gift(self):
         self.logger.info("Open the required page")
-        self.browser.engine.get(self.url)
+        self.browser.get_engine().get(self.url)
 
         try:
             self.logger.info("Try to upload and use the cookie file")
             if not self.browser.use_cookies():
+                self.logger.warning("There is no cookie file")
+
                 self.logger.info("Click on the login button")
-                login = self.browser.engine.find_element(By.CSS_SELECTOR, "[data-cm-event='login']")
+                login = self.browser.get_engine().find_element(By.CSS_SELECTOR, "[data-cm-event='login']")
                 login.click()
 
                 self.logger.info("Waiting for a redirect")
-                username = WebDriverWait(self.browser.engine, 30).until(ec.presence_of_element_located((By.ID, "id_login")))
-                password = WebDriverWait(self.browser.engine, 30).until(ec.presence_of_element_located((By.ID, "id_password")))
+                username = WebDriverWait(self.browser.get_engine(), 30).until(ec.presence_of_element_located((By.ID, "id_login")))
+                password = WebDriverWait(self.browser.get_engine(), 30).until(ec.presence_of_element_located((By.ID, "id_password")))
 
                 self.logger.info("Fill in the username and password")
                 username.send_keys(self.username)
                 password.send_keys(self.password)
 
                 self.logger.info("Waiting for a login process")
-                submit = self.browser.engine.find_element(By.CSS_SELECTOR, "button.button-airy")
+                submit = self.browser.get_engine().find_element(By.CSS_SELECTOR, "button.button-airy")
                 submit.click()
 
                 self.check_login_status()
@@ -92,7 +94,7 @@ class WotBot:
                 self.browser.save_cookies()
 
             self.logger.info("Try to get a gift")
-            cur_item = self.browser.engine.find_element(By.CSS_SELECTOR, ".c_item.c_default")
+            cur_item = self.browser.get_engine().find_element(By.CSS_SELECTOR, ".c_item.c_default")
             cur_item.click()
 
             gift_desc = f"Your gift for today: {cur_item.text}"
@@ -109,7 +111,7 @@ class WotBot:
 
     def check_login_status(self):
         try:
-            login_status = WebDriverWait(self.browser.engine, 5).until(
+            login_status = WebDriverWait(self.browser.get_engine(), 5).until(
                 ec.presence_of_element_located((By.CSS_SELECTOR, "p.js-form-errors-content")))
             if login_status is not None:
                 raise LoginException()
