@@ -1,5 +1,4 @@
 import sys
-import pickle
 
 from selenium.common import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
@@ -15,12 +14,20 @@ from logger import CustomLogger
 class WotBot:
     def __init__(self, config_path, log_path):
         self.config = Config(config_path)
+        self.browser = None
         self.url = None
         self.username = None
         self.password = None
         self.token = None
         self.logger = CustomLogger(log_path)
-        self.browser = Browser("Chrome", False)
+
+
+    def check_gift_status(self):
+        self.logger.info("Check the log for whether a gift has been received")
+
+        if self.logger.check_logs():
+            self.logger.warning("The gift has already been received")
+            sys.exit()
 
 
     def config_props(self):
@@ -29,6 +36,7 @@ class WotBot:
         try:
             props = self.config.prepare_data()
 
+            self.browser = Browser(props["driver"], props["headless"])
             self.url = props["url"]
             self.username = props["username"]
             self.password = props["password"]
@@ -49,7 +57,7 @@ class WotBot:
             sys.exit()
 
 
-    def stop_browser(self):
+    def release_resources(self):
         if self.browser.engine is not None:
             self.logger.info("Stop the browser")
             self.browser.stop()
@@ -60,7 +68,8 @@ class WotBot:
         self.browser.engine.get(self.url)
 
         try:
-            if not self.use_cookies():
+            self.logger.info("Try to upload and use the cookie file")
+            if not self.browser.use_cookies():
                 self.logger.info("Click on the login button")
                 login = self.browser.engine.find_element(By.CSS_SELECTOR, "[data-cm-event='login']")
                 login.click()
@@ -78,7 +87,9 @@ class WotBot:
                 submit.click()
 
                 self.check_login_status()
-                self.save_cookies()
+
+                self.logger.info("Save a cookie file")
+                self.browser.save_cookies()
 
             self.logger.info("Try to get a gift")
             cur_item = self.browser.engine.find_element(By.CSS_SELECTOR, ".c_item.c_default")
@@ -88,19 +99,11 @@ class WotBot:
             self.logger.info(gift_desc.replace("\n", " "))
         except LoginException:
             self.logger.error("The login process failed")
-            self.stop_browser()
+            self.release_resources()
             sys.exit()
         except NoSuchElementException:
             self.logger.warning("The gift has already been received")
-            self.stop_browser()
-            sys.exit()
-
-
-    def check_gift_status(self):
-        self.logger.info("Check the log for whether a gift has been received")
-
-        if self.logger.check_logs():
-            self.logger.warning("The gift has already been received")
+            self.release_resources()
             sys.exit()
 
 
@@ -112,22 +115,3 @@ class WotBot:
                 raise LoginException()
         except TimeoutException:
             pass
-
-
-    def use_cookies(self):
-        self.logger.info("Try to upload and use the cookie file")
-        try:
-            for cookie in pickle.load(open(".cookies", "rb")):
-                self.browser.engine.add_cookie(cookie)
-
-            self.browser.engine.refresh()
-
-            return True
-        except FileNotFoundError:
-            self.logger.warning("There is no cookie file")
-            return False
-
-
-    def save_cookies(self):
-        self.logger.info("Save a cookie file")
-        pickle.dump(self.browser.engine.get_cookies(), open(".cookies", "wb"))

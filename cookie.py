@@ -1,2 +1,15 @@
+import pickle
+
+
 class Cookie:
-    pass
+    def __init__(self, engine):
+        self.engine = engine
+
+
+    def use(self):
+        for cookie in pickle.load(open(".cookies", "rb")):
+            self.engine.add_cookie(cookie)
+
+
+    def save(self):
+        pickle.dump(self.engine.get_cookies(), open(".cookies", "wb"))

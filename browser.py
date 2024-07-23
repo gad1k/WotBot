@@ -4,11 +4,13 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
+from cookie import Cookie
+
 
 class Browser:
-    def __init__(self, driver, headless=True):
+    def __init__(self, driver, headless):
         self.engine = self.init_engine(driver, headless)
-        self.cookie = None
+        self.cookie = Cookie(self.engine)
 
 
     def init_engine(self, driver, headless):
@@ -46,3 +48,16 @@ class Browser:
     def stop(self):
         if self.engine is not None:
             self.engine.quit()
+
+
+    def use_cookies(self):
+        try:
+            self.cookie.use()
+            self.engine.refresh()
+            return True
+        except FileNotFoundError:
+            return False
+
+
+    def save_cookies(self):
+        self.cookie.save()
