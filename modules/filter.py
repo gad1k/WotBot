@@ -9,4 +9,4 @@ class CommonFilter(logging.Filter):
 
 class StreamFilter(logging.Filter):
     def filter(self, record):
-        return record.module == "wot_bot"
+        return record.module == "bot"

@@ -11,7 +11,7 @@ from modules.exception import CredsException, InactiveChatException, InvalidToke
 from modules.logger import CustomLogger
 
 
-class WotBot:
+class Bot:
     def __init__(self, config_path, log_path):
         self.config = Config(config_path)
         self.browser = None

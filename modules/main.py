@@ -1,9 +1,9 @@
-from modules.wot_bot import WotBot
+from modules.bot import Bot
 
 
 params = ["../settings/config.json", "../settings/wot_bot.log"]
 
-bot = WotBot(*params)
+bot = Bot(*params)
 bot.check_gift_status()
 bot.config_props()
 bot.get_gift()

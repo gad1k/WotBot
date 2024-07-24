@@ -6,7 +6,7 @@ from selenium.webdriver import ChromeOptions
 from modules.config import Config
 from modules.exception import CredsException, InactiveChatException, InvalidTokenException
 from modules.logger import CustomLogger
-from modules.wot_bot import WotBot
+from modules.bot import WotBot
 
 
 class TestWotBot(TestCase):
