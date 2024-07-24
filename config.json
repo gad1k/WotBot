@@ -3,5 +3,6 @@
   "url": "https://tanki.su/ru/daily-check-in/",
   "username": "",
   "password": "",
-  "token": ""
+  "token": "",
+  "headless": true
 }
