@@ -11,8 +11,8 @@ class TelegramExporter:
 
     def try_upload_cached_chat_id(self):
         try:
-            with open("../settings/.settings") as settings:
-                self.chat_id = settings.readline()
+            with open("../settings/preferences") as preferences:
+                self.chat_id = preferences.readline()
         except FileNotFoundError:
             pass
 
@@ -24,15 +24,15 @@ class TelegramExporter:
                 response = requests.get(url).json()
 
                 self.chat_id = response["result"][-1]["message"]["chat"]["id"]
-                self.save_settings()
+                self.save_preferences()
         except IndexError:
             raise InactiveChatException()
         except KeyError:
             raise InvalidTokenException()
 
 
-    def save_settings(self):
-        with open("../settings/.settings", "w", encoding="utf-8") as settings:
+    def save_preferences(self):
+        with open("../settings/preferences", "w", encoding="utf-8") as settings:
             settings.write(str(self.chat_id))
 
 

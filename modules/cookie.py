@@ -7,9 +7,9 @@ class Cookie:
 
 
     def use(self):
-        for cookie in pickle.load(open("../settings/.cookies", "rb")):
+        for cookie in pickle.load(open("../settings/cookies", "rb")):
             self.engine.add_cookie(cookie)
 
 
     def save(self):
-        pickle.dump(self.engine.get_cookies(), open("../settings/.cookies", "wb"))
+        pickle.dump(self.engine.get_cookies(), open("../settings/cookies", "wb"))
