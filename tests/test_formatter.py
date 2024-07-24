@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from unittest import TestCase
 
-from formatter import FileFormatter, StreamFormatter
+from modules.formatter import FileFormatter, StreamFormatter
 
 
 class TestFileFormatter(TestCase):

@@ -4,7 +4,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
-from cookie import Cookie
+from modules.cookie import Cookie
 
 
 class Browser:

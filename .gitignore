@@ -2,10 +2,10 @@
 .venv/
 __pycache__/
 
-.cookies
+settings/.cookies
 .coverage
 .flake8
-.settings
-script_daily.bat
-script_schedule.vbs
-wot_bot.log
+settings/.settings
+scripts/script_daily.bat
+scripts/script_schedule.vbs
+settings/wot_bot.log

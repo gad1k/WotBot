@@ -6,9 +6,9 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 
 from browser import Browser
-from config import Config
-from exception import CredsException, InactiveChatException, InvalidTokenException, LoginException
-from logger import CustomLogger
+from modules.config import Config
+from modules.exception import CredsException, InactiveChatException, InvalidTokenException, LoginException
+from modules.logger import CustomLogger
 
 
 class WotBot:

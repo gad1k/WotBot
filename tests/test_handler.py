@@ -2,8 +2,8 @@ import logging
 
 from unittest import mock, TestCase
 
-from exporter import TelegramExporter
-from handler import TelegramHandler
+from modules.exporter import TelegramExporter
+from modules.handler import TelegramHandler
 
 
 class TestExporter(TestCase):

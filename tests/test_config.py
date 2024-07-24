@@ -1,7 +1,7 @@
 from unittest import mock, TestCase
 
-from config import Config
-from exception import CredsException
+from modules.config import Config
+from modules.exception import CredsException
 
 
 class TestConfig(TestCase):

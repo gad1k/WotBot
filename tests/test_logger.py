@@ -1,12 +1,12 @@
-import handler
+from modules import handler
 import logging
 import os
 
 from datetime import datetime
 from unittest import mock, TestCase
 
-from exporter import TelegramExporter
-from logger import CustomLogger
+from modules.exporter import TelegramExporter
+from modules.logger import CustomLogger
 
 
 class TestLogger(TestCase):

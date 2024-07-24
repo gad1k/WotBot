@@ -2,7 +2,7 @@ import logging
 
 from unittest import TestCase
 
-from filter import CommonFilter, StreamFilter
+from modules.filter import CommonFilter, StreamFilter
 
 
 class TestCommonFilter(TestCase):

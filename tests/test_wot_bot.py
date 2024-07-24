@@ -3,10 +3,10 @@ import os
 from unittest import mock, TestCase
 from selenium.webdriver import ChromeOptions
 
-from config import Config
-from exception import CredsException, InactiveChatException, InvalidTokenException
-from logger import CustomLogger
-from wot_bot import WotBot
+from modules.config import Config
+from modules.exception import CredsException, InactiveChatException, InvalidTokenException
+from modules.logger import CustomLogger
+from modules.wot_bot import WotBot
 
 
 class TestWotBot(TestCase):

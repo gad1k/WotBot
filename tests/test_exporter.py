@@ -1,8 +1,8 @@
 from unittest import mock, TestCase
 from requests.models import Response
 
-from exporter import TelegramExporter
-from exception import InactiveChatException, InvalidTokenException
+from modules.exporter import TelegramExporter
+from modules.exception import InactiveChatException, InvalidTokenException
 
 
 class TestExporter(TestCase):
