@@ -2,9 +2,10 @@ import logging
 import sys
 
 from datetime import datetime, timedelta
-from filter import CommonFilter, StreamFilter
-from formatter import FileFormatter, StreamFormatter
-from handler import TelegramHandler
+
+from modules.filter import CommonFilter, StreamFilter
+from modules.formatter import FileFormatter, StreamFormatter
+from modules.handler import TelegramHandler
 
 
 class CustomLogger(logging.Logger):

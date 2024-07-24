@@ -1,6 +1,6 @@
 import json
 
-from exception import CredsException
+from modules.exception import CredsException
 
 
 class Config:

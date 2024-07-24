@@ -1,7 +1,7 @@
 import sys
 import logging
 
-from exporter import TelegramExporter
+from modules.exporter import TelegramExporter
 
 
 class TelegramHandler(logging.FileHandler):

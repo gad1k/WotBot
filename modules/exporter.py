@@ -1,6 +1,6 @@
 import requests
 
-from exception import InactiveChatException, InvalidTokenException
+from modules.exception import InactiveChatException, InvalidTokenException
 
 
 class TelegramExporter:
