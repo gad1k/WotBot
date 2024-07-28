@@ -1,5 +1,9 @@
 from unittest import mock, TestCase
+
 from selenium.webdriver import ChromeOptions
+from selenium.webdriver.chrome.webdriver import WebDriver as WebDriverChrome
+from selenium.webdriver.edge.webdriver import WebDriver as WebDriverEdge
+from selenium.webdriver.firefox.webdriver import WebDriver as WebDriverFirefox
 
 from modules.browser import Browser
 from modules.cookie import Cookie
@@ -19,13 +23,34 @@ class TestBrowser(TestCase):
 
     @mock.patch.object(Browser, "init_engine")
     @mock.patch("selenium.webdriver.Chrome")
-    def test_get_ingine(self, mock_web_driver, mock_init_engine):
+    def test_get_engine(self, mock_web_driver, mock_init_engine):
         browser = Browser("Chrome", True)
         browser.engine = mock_web_driver
 
         self.assertTrue(browser.headless)
         self.assertEqual(browser.get_engine(), mock_web_driver)
         mock_init_engine.assert_called_once_with("Chrome")
+
+
+    def test_init_engine_chrome(self):
+        browser = Browser("Chrome", True)
+
+        self.assertTrue(browser.headless)
+        self.assertIsInstance(browser.engine, WebDriverChrome)
+
+
+    def test_init_engine_edge(self):
+        browser = Browser("Edge", True)
+
+        self.assertTrue(browser.headless)
+        self.assertIsInstance(browser.engine, WebDriverEdge)
+
+
+    def test_init_engine_firefox(self):
+        browser = Browser("Firefox", True)
+
+        self.assertTrue(browser.headless)
+        self.assertIsInstance(browser.engine, WebDriverFirefox)
 
 
     @mock.patch.object(Browser, "init_engine")
