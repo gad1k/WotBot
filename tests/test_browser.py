@@ -113,7 +113,7 @@ class TestBrowser(TestCase):
 
     @mock.patch.object(Browser, "init_engine")
     @mock.patch.object(Cookie, "use", side_effect=FileNotFoundError)
-    def test_use_cookies_file_not_found_exception(self, mock_use, mock_init_engine):
+    def test_use_cookies_catch_file_not_found_error(self, mock_use, mock_init_engine):
         browser = Browser("Chrome", True)
 
         self.assertTrue(browser.headless)

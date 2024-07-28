@@ -11,28 +11,6 @@ class TestExporter(TestCase):
         self.response = mock.MagicMock(spec=Response)
 
 
-    @mock.patch("requests.get")
-    def test_exception_inactive_chat(self, mock_get):
-        self.response.json.return_value = {"result": []}
-        mock_get.return_value = self.response
-
-        self.assertRaises(InactiveChatException, self.exporter.try_retrieve_chat_id_remotely)
-        mock_get.assert_called_once_with("https://api.telegram.org/botdummy_token/getUpdates")
-
-
-    @mock.patch("requests.get")
-    def test_exception_invalid_token(self, mock_get):
-        self.response.json.return_value = {"error_code": 404}
-        mock_get.return_value = self.response
-
-        self.assertRaises(InvalidTokenException, self.exporter.try_retrieve_chat_id_remotely)
-        mock_get.assert_called_once_with("https://api.telegram.org/botdummy_token/getUpdates")
-
-
-    def test_exception_missing_cookie(self):
-        self.exporter.try_upload_cached_chat_id()
-
-
     @mock.patch("builtins.open", new_callable=mock.mock_open)
     def test_save_preferences(self, mock_open):
         with mock.patch.object(self.exporter, "chat_id", "dummy_chat_id"):
@@ -65,6 +43,24 @@ class TestExporter(TestCase):
         mock_save_preferences.assert_called_once()
 
 
+    @mock.patch("requests.get")
+    def test_try_retrieve_chat_id_remotely_catch_inactive_chat_exception(self, mock_get):
+        self.response.json.return_value = {"result": []}
+        mock_get.return_value = self.response
+
+        self.assertRaises(InactiveChatException, self.exporter.try_retrieve_chat_id_remotely)
+        mock_get.assert_called_once_with("https://api.telegram.org/botdummy_token/getUpdates")
+
+
+    @mock.patch("requests.get")
+    def test_try_retrieve_chat_id_remotely_catch_invalid_token_exception(self, mock_get):
+        self.response.json.return_value = {"error_code": 404}
+        mock_get.return_value = self.response
+
+        self.assertRaises(InvalidTokenException, self.exporter.try_retrieve_chat_id_remotely)
+        mock_get.assert_called_once_with("https://api.telegram.org/botdummy_token/getUpdates")
+
+
     @mock.patch("builtins.open", new_callable=mock.mock_open)
     def test_try_upload_cached_chat_id(self, mock_open):
         mock_open.return_value.readline.return_value = "dummy_token"
@@ -73,3 +69,7 @@ class TestExporter(TestCase):
 
         self.assertEqual(self.exporter.chat_id, "dummy_token")
         mock_open.assert_called_once_with("../settings/preferences")
+
+
+    def test_try_upload_cached_chat_id_catch_file_not_found_error(self):
+        self.exporter.try_upload_cached_chat_id()

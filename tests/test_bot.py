@@ -70,7 +70,7 @@ class TestBot(TestCase):
 
     @mock.patch.object(Config, "prepare_data", side_effect=CredsException)
     @mock.patch("sys.exit")
-    def test_config_props_creds_exception(self, mock_exit, mock_prepare_data):
+    def test_config_props_catch_creds_exception(self, mock_exit, mock_prepare_data):
         self.bot.config_props()
 
         self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[1])
@@ -80,7 +80,7 @@ class TestBot(TestCase):
 
 
     @mock.patch("sys.exit")
-    def test_config_props_file_not_found_exception(self, mock_exit):
+    def test_config_props_catch_file_not_found_error(self, mock_exit):
         self.bot.config_props()
 
         self.assertRaises(FileNotFoundError, self.bot.config.prepare_data)
@@ -92,7 +92,7 @@ class TestBot(TestCase):
     @mock.patch.object(Browser, "__init__")
     @mock.patch.object(Config, "prepare_data")
     @mock.patch.object(CustomLogger, "add_telegram_handler", side_effect=InactiveChatException)
-    def test_config_props_inactive_chat_exception(self, mock_add_telegram_handler, mock_prepare_data, mock_browser):
+    def test_config_props_catch_inactive_chat_exception(self, mock_add_telegram_handler, mock_prepare_data, mock_browser):
         mock_browser.return_value = None
         mock_prepare_data.return_value = {
             "driver": "Chrome",
@@ -113,7 +113,7 @@ class TestBot(TestCase):
     @mock.patch.object(Browser, "__init__")
     @mock.patch.object(Config, "prepare_data")
     @mock.patch.object(CustomLogger, "add_telegram_handler", side_effect=InvalidTokenException)
-    def test_config_props_invalid_token_exception(self, mock_add_telegram_handler, mock_prepare_data, mock_browser):
+    def test_config_props_catch_invalid_token_exception(self, mock_add_telegram_handler, mock_prepare_data, mock_browser):
         mock_browser.return_value = None
         mock_prepare_data.return_value = {
             "driver": "Chrome",
