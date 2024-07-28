@@ -34,11 +34,11 @@ class TestExporter(TestCase):
 
 
     @mock.patch("builtins.open", new_callable=mock.mock_open)
-    def test_save_settings(self, mock_open):
+    def test_save_preferences(self, mock_open):
         with mock.patch.object(self.exporter, "chat_id", "dummy_chat_id"):
-            self.exporter.save_settings()
+            self.exporter.save_preferences()
 
-        mock_open.assert_called_once_with(".settings", "w", encoding="utf-8")
+        mock_open.assert_called_once_with("../settings/preferences", "w", encoding="utf-8")
         mock_open().write.assert_called_once_with("dummy_chat_id")
 
 
@@ -52,9 +52,9 @@ class TestExporter(TestCase):
         mock_get.assert_called_once_with(expected_result)
 
 
-    @mock.patch.object(TelegramExporter, "save_settings")
+    @mock.patch.object(TelegramExporter, "save_preferences")
     @mock.patch("requests.get")
-    def test_try_retrieve_chat_id_remotely(self, mock_get, mock_save_settings):
+    def test_try_retrieve_chat_id_remotely(self, mock_get, mock_save_preferences):
         self.response.json.return_value = {"result": [{"message": {"chat": {"id": "dummy_chat_id"}}}]}
         mock_get.return_value = self.response
 
@@ -62,7 +62,7 @@ class TestExporter(TestCase):
 
         self.assertEqual(self.exporter.chat_id, "dummy_chat_id")
         mock_get.assert_called_once_with("https://api.telegram.org/botdummy_token/getUpdates")
-        mock_save_settings.assert_called_once()
+        mock_save_preferences.assert_called_once()
 
 
     @mock.patch("builtins.open", new_callable=mock.mock_open)
@@ -72,4 +72,4 @@ class TestExporter(TestCase):
         self.exporter.try_upload_cached_chat_id()
 
         self.assertEqual(self.exporter.chat_id, "dummy_token")
-        mock_open.assert_called_once_with(".settings")
+        mock_open.assert_called_once_with("../settings/preferences")

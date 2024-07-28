@@ -1,10 +1,10 @@
-from modules import handler
 import logging
 import os
 
 from datetime import datetime
 from unittest import mock, TestCase
 
+from modules.handler import TelegramHandler
 from modules.exporter import TelegramExporter
 from modules.logger import CustomLogger
 
@@ -28,14 +28,14 @@ class TestLogger(TestCase):
         self.logger.add_telegram_handler("dummy_token")
 
         self.assertEqual(len(self.logger.handlers), 3)
-        self.assertIsInstance(self.logger.handlers[2], handler.TelegramHandler)
+        self.assertIsInstance(self.logger.handlers[2], TelegramHandler)
         mock_try_upload_cached_chat_id.assert_called_once()
         mock_try_retrieve_chat_id_remotely.assert_called_once()
 
 
     @mock.patch.object(CustomLogger, "read_logs")
     @mock.patch.object(CustomLogger, "convert_to_utc")
-    @mock.patch("logger.datetime")
+    @mock.patch("modules.logger.datetime")
     def test_check_logs_false(self, mock_datetime, mock_convert_to_utc, mock_read_logs):
         mock_datetime.today.return_value = datetime(2024, 6, 27)
         mock_read_logs.return_value = ["2024-06-27 14:12:40,451 [ERROR] Failure"]
@@ -48,7 +48,7 @@ class TestLogger(TestCase):
 
     @mock.patch.object(CustomLogger, "read_logs")
     @mock.patch.object(CustomLogger, "convert_to_utc")
-    @mock.patch("logger.datetime")
+    @mock.patch("modules.logger.datetime")
     def test_check_logs_true(self, mock_datetime, mock_convert_to_utc, mock_read_logs):
         mock_datetime.today.return_value = datetime(2024, 6, 27)
         mock_read_logs.return_value = ["2024-06-27 14:12:40,451 [INFO] Success"]

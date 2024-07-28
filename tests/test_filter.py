@@ -61,7 +61,7 @@ class TestStreamFilter(TestCase):
         attrs = {
             "name": "dummy_name",
             "level": 20,
-            "pathname": "wot_bot",
+            "pathname": "bot",
             "lineno": 2,
             "msg": "dummy_message",
             "args": {},

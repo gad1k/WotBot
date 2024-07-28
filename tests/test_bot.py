@@ -3,13 +3,14 @@ import os
 from unittest import mock, TestCase
 from selenium.webdriver import ChromeOptions
 
+from modules.browser import Browser
 from modules.config import Config
 from modules.exception import CredsException, InactiveChatException, InvalidTokenException
 from modules.logger import CustomLogger
-from modules.bot import WotBot
+from modules.bot import Bot
 
 
-class TestWotBot(TestCase):
+class TestBot(TestCase):
     def setUp(self):
         levels = ["info", "warning", "error"]
 
@@ -19,7 +20,7 @@ class TestWotBot(TestCase):
         self.messages = [
             "Check the log for whether a gift has been received",
             "Config the bot properties",
-            "Stop the browser",
+            "Release resources",
             "Telegram bot is inactive",
             "Telegram token is incorrect",
             "The gift has already been received",
@@ -27,7 +28,7 @@ class TestWotBot(TestCase):
             "Username or password isn't set"
         ]
 
-        self.bot = WotBot(self.config_path, self.log_path)
+        self.bot = Bot(self.config_path, self.log_path)
 
 
     def tearDown(self):
@@ -79,15 +80,18 @@ class TestWotBot(TestCase):
         mock_exit.assert_called_once()
 
 
+    @mock.patch.object(Browser, "__init__")
     @mock.patch.object(Config, "prepare_data")
     @mock.patch.object(CustomLogger, "add_telegram_handler", side_effect=InactiveChatException)
-    def test_config_props_inactive_chat_exception(self, mock_add_telegram_handler, mock_prepare_data):
+    def test_config_props_inactive_chat_exception(self, mock_add_telegram_handler, mock_prepare_data, mock_browser):
+        mock_browser.return_value = None
         mock_prepare_data.return_value = {
             "driver": "Chrome",
             "url": "dummy_url",
             "username": "dummy_username",
             "password": "dummy_password",
-            "token": "dummy_token"
+            "token": "dummy_token",
+            "headless": True
         }
 
         self.bot.config_props()
@@ -97,22 +101,25 @@ class TestWotBot(TestCase):
         mock_add_telegram_handler.assert_called_once_with("dummy_token")
 
 
+    @mock.patch.object(Browser, "__init__")
     @mock.patch.object(Config, "prepare_data")
     @mock.patch.object(CustomLogger, "add_telegram_handler", side_effect=InvalidTokenException)
-    def test_config_props_invalid_token_exception(self, mock_add_telegram_handler, mock_prepare_data):
+    def test_config_props_invalid_token_exception(self, mock_add_telegram_handler, mock_prepare_data, mock_browser):
+        mock_browser.return_value = None
         mock_prepare_data.return_value = {
             "driver": "Chrome",
             "url": "dummy_url",
             "username": "dummy_username",
             "password": "dummy_password",
-            "token": "dummy_token"
+            "token": "dummy_token",
+            "headless": True
         }
 
         self.bot.config_props()
 
         self.assertEqual(self.mock_levels["info"].call_count, 2)
-        mock_add_telegram_handler.assert_called_once_with("dummy_token")
         self.mock_levels["warning"].assert_called_once_with(self.bot.logger, self.messages[4])
+        mock_add_telegram_handler.assert_called_once_with("dummy_token")
 
 
     @mock.patch("sys.exit")
@@ -133,7 +140,8 @@ class TestWotBot(TestCase):
             "url": "dummy_url",
             "username": "dummy_username",
             "password": "dummy_password",
-            "token": "dummy_token"
+            "token": "dummy_token",
+            "headless": True
         }
 
         self.bot.config_props()
@@ -169,6 +177,15 @@ class TestWotBot(TestCase):
         mock_prepare_data.assert_called_once()
 
 
+    @mock.patch("selenium.webdriver.Chrome")
+    def test_release_resources(self, MockWebDriver):
+        self.bot.browser = MockWebDriver
+
+        self.bot.release_resources()
+
+        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[2])
+
+
     def test_set_options_headless_false(self):
         options = self.bot.set_options(False, ChromeOptions())
 
@@ -186,17 +203,3 @@ class TestWotBot(TestCase):
         self.assertEqual(options.arguments[2], "--disable-gpu")
         self.assertEqual(options.arguments[3], "--log-level=3")
         self.assertEqual(options.arguments[4], "--ignore-certificate-errors")
-
-
-    def test_start_browser(self):
-        # self.bot.start_browser()
-        pass
-
-
-    @mock.patch("selenium.webdriver.Chrome")
-    def test_stop_browser(self, MockWebDriver):
-        self.bot.browser = MockWebDriver
-
-        self.bot.stop_browser()
-
-        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[2])
