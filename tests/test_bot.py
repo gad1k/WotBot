@@ -1,7 +1,6 @@
 import os
 
 from unittest import mock, TestCase
-from selenium.webdriver import ChromeOptions
 
 from modules.browser import Browser
 from modules.config import Config
@@ -80,6 +79,16 @@ class TestBot(TestCase):
         mock_exit.assert_called_once()
 
 
+    @mock.patch("sys.exit")
+    def test_config_props_file_not_found_exception(self, mock_exit):
+        self.bot.config_props()
+
+        self.assertRaises(FileNotFoundError, self.bot.config.prepare_data)
+        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[1])
+        self.mock_levels["error"].assert_called_once_with(self.bot.logger, self.messages[6])
+        mock_exit.assert_called_once()
+
+
     @mock.patch.object(Browser, "__init__")
     @mock.patch.object(Config, "prepare_data")
     @mock.patch.object(CustomLogger, "add_telegram_handler", side_effect=InactiveChatException)
@@ -122,19 +131,11 @@ class TestBot(TestCase):
         mock_add_telegram_handler.assert_called_once_with("dummy_token")
 
 
-    @mock.patch("sys.exit")
-    def test_config_props_file_not_found_exception(self, mock_exit):
-        self.bot.config_props()
-
-        self.assertRaises(FileNotFoundError, self.bot.config.prepare_data)
-        self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[1])
-        self.mock_levels["error"].assert_called_once_with(self.bot.logger, self.messages[6])
-        mock_exit.assert_called_once()
-
-
+    @mock.patch.object(Browser, "__init__")
     @mock.patch.object(Config, "prepare_data")
     @mock.patch.object(CustomLogger, "add_telegram_handler")
-    def test_config_props_with_th(self, mock_add_telegram_handler, mock_prepare_data):
+    def test_config_props_with_th(self, mock_add_telegram_handler, mock_prepare_data, mock_browser):
+        mock_browser.return_value = None
         mock_prepare_data.return_value = {
             "driver": "Chrome",
             "url": "dummy_url",
@@ -150,20 +151,22 @@ class TestBot(TestCase):
         self.assertEqual(self.bot.username, "dummy_username")
         self.assertEqual(self.bot.password, "dummy_password")
         self.assertEqual(self.bot.token, "dummy_token")
-        self.assertEqual(self.bot.driver, "Chrome")
         self.assertEqual(self.mock_levels["info"].call_count, 2)
         mock_prepare_data.assert_called_once()
         mock_add_telegram_handler.assert_called_once_with("dummy_token")
 
 
+    @mock.patch.object(Browser, "__init__")
     @mock.patch.object(Config, "prepare_data")
-    def test_config_props_without_th(self, mock_prepare_data):
+    def test_config_props_without_th(self, mock_prepare_data, mock_browser):
+        mock_browser.return_value = None
         mock_prepare_data.return_value = {
             "driver": "Chrome",
             "url": "dummy_url",
             "username": "dummy_username",
             "password": "dummy_password",
-            "token": ""
+            "token": "",
+            "headless": True
         }
 
         self.bot.config_props()
@@ -172,7 +175,6 @@ class TestBot(TestCase):
         self.assertEqual(self.bot.username, "dummy_username")
         self.assertEqual(self.bot.password, "dummy_password")
         self.assertEqual(self.bot.token, "")
-        self.assertEqual(self.bot.driver, "Chrome")
         self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[1])
         mock_prepare_data.assert_called_once()
 
@@ -184,22 +186,3 @@ class TestBot(TestCase):
         self.bot.release_resources()
 
         self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[2])
-
-
-    def test_set_options_headless_false(self):
-        options = self.bot.set_options(False, ChromeOptions())
-
-        self.assertEqual(options.arguments[0], "--window-size=1280,900")
-        self.assertEqual(options.arguments[1], "--disable-gpu")
-        self.assertEqual(options.arguments[2], "--log-level=3")
-        self.assertEqual(options.arguments[3], "--ignore-certificate-errors")
-
-
-    def test_set_options_headless_true(self):
-        options = self.bot.set_options(True, ChromeOptions())
-
-        self.assertEqual(options.arguments[0], "--headless")
-        self.assertEqual(options.arguments[1], "--window-size=1280,900")
-        self.assertEqual(options.arguments[2], "--disable-gpu")
-        self.assertEqual(options.arguments[3], "--log-level=3")
-        self.assertEqual(options.arguments[4], "--ignore-certificate-errors")
