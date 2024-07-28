@@ -180,9 +180,8 @@ class TestBot(TestCase):
 
 
     @mock.patch("selenium.webdriver.Chrome")
-    def test_release_resources(self, MockWebDriver):
-        self.bot.browser = MockWebDriver
-
+    def test_release_resources(self, mock_web_driver):
+        self.bot.browser = mock_web_driver
         self.bot.release_resources()
 
         self.mock_levels["info"].assert_called_once_with(self.bot.logger, self.messages[2])
