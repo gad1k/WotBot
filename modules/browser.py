@@ -9,31 +9,32 @@ from modules.cookie import Cookie
 
 class Browser:
     def __init__(self, driver, headless):
-        self.engine = self.init_engine(driver, headless)
+        self.headless = headless
+        self.engine = self.init_engine(driver)
         self.cookie = Cookie(self.engine)
 
 
-    def init_engine(self, driver, headless):
+    def init_engine(self, driver):
         if driver == "Chrome":
             service = ChromeService(ChromeDriverManager().install())
-            options = self.set_options(headless, ChromeOptions())
+            options = self.set_options(ChromeOptions(), self.headless)
 
             engine = webdriver.Chrome(service=service, options=options)
         elif driver == "Edge":
             service = EdgeService(EdgeChromiumDriverManager().install())
-            options = self.set_options(headless, EdgeOptions())
+            options = self.set_options(EdgeOptions(), self.headless)
 
             engine = webdriver.Edge(service=service, options=options)
         else:
             service = FirefoxService(GeckoDriverManager().install())
-            options = self.set_options(headless, FirefoxOptions())
+            options = self.set_options(FirefoxOptions(), self.headless)
 
             engine = webdriver.Firefox(service=service, options=options)
 
         return engine
 
 
-    def set_options(self, headless, options):
+    def set_options(self, options, headless):
         if headless:
             options.add_argument("--headless")
 
