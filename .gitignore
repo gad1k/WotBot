@@ -3,7 +3,6 @@
 __pycache__/
 
 .coverage
-.flake8
 
 cookies
 preferences
