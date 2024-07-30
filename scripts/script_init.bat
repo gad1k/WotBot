@@ -5,6 +5,8 @@ python -m pip install --upgrade pip
 python -m pip install -r ..\requirements.txt
 
 :: Define variables for the settings
+for %%I in ("%cd%\..") do set "project_dir=%%~fI"
+
 set task_name=WotDaily
 set task_daily="%cd%\script_daily.bat"
 set task_schedule="wscript %cd%\script_schedule.vbs"
@@ -13,10 +15,7 @@ set task_interval=1
 set task_owner=%username%
 
 :: Create a bat file for the task
-echo :: Daily Script > script_daily.bat
-echo for %I in ("%cd%\..") do set "project_dir=%~fI" >> script_daily.bat
-echo cd /d %project_dir% >> script_daily.bat
-echo set pythonpath=%project_dir% >> script_daily.bat
+echo cd /d %project_dir% > script_daily.bat
 echo call .venv\Scripts\activate.bat >> script_daily.bat
 echo cd .\modules >> script_daily.bat
 echo python main.py >> script_daily.bat
