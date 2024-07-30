@@ -92,7 +92,7 @@ class TestBot(TestCase):
     @mock.patch.object(Browser, "__init__")
     @mock.patch.object(Config, "prepare_data")
     @mock.patch.object(CustomLogger, "add_telegram_handler", side_effect=InactiveChatException)
-    def test_config_props_catch_inactive_chat_exception(self, mock_add_telegram_handler, mock_prepare_data, mock_browser):
+    def test_config_props_catch_inactive_chat_exception(self, mock_add_th, mock_prepare_data, mock_browser):
         mock_browser.return_value = None
         mock_prepare_data.return_value = {
             "driver": "Chrome",
@@ -107,13 +107,13 @@ class TestBot(TestCase):
 
         self.assertEqual(self.mock_levels["info"].call_count, 2)
         self.mock_levels["warning"].assert_called_once_with(self.bot.logger, self.messages[3])
-        mock_add_telegram_handler.assert_called_once_with("dummy_token")
+        mock_add_th.assert_called_once_with("dummy_token")
 
 
     @mock.patch.object(Browser, "__init__")
     @mock.patch.object(Config, "prepare_data")
     @mock.patch.object(CustomLogger, "add_telegram_handler", side_effect=InvalidTokenException)
-    def test_config_props_catch_invalid_token_exception(self, mock_add_telegram_handler, mock_prepare_data, mock_browser):
+    def test_config_props_catch_invalid_token_exception(self, mock_add_th, mock_prepare_data, mock_browser):
         mock_browser.return_value = None
         mock_prepare_data.return_value = {
             "driver": "Chrome",
@@ -128,7 +128,7 @@ class TestBot(TestCase):
 
         self.assertEqual(self.mock_levels["info"].call_count, 2)
         self.mock_levels["warning"].assert_called_once_with(self.bot.logger, self.messages[4])
-        mock_add_telegram_handler.assert_called_once_with("dummy_token")
+        mock_add_th.assert_called_once_with("dummy_token")
 
 
     @mock.patch.object(Browser, "__init__")
