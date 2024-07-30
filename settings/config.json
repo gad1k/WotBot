@@ -1,8 +1,8 @@
 {
-  "driver": "Firefox",
+  "driver": "Chrome",
   "url": "https://tanki.su/ru/daily-check-in/",
   "username": "",
   "password": "",
   "token": "",
-  "headless": false
+  "headless": true
 }

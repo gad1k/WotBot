@@ -18,6 +18,7 @@ set task_owner=%username%
 echo cd /d %project_dir% > script_daily.bat
 echo call .venv\Scripts\activate.bat >> script_daily.bat
 echo cd .\modules >> script_daily.bat
+echo set pythonpath=%project_dir% >> script_daily.bat
 echo python main.py >> script_daily.bat
 
 :: Create a vbs file for the schedule
